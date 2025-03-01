@@ -1,10 +1,10 @@
 # alfred
 A POC to demonstrate batch-serving of hyper-personalized notifications
 
-#The demo uses 
-flask
-ollama
-llama3.2:latest model (pulled via ollama)
+# The demo uses: 
+1. flask
+2. ollama
+3. llama3.2:latest model (pulled via ollama)
 
 ## to run: 
 `python app.py`
