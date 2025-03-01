@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Toss & Dice Roll Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Coin Toss & Dice Roll Monitor</h1>
+    <div class="container">
+        <div class="game-area">
+            <div class="coin" id="coin">🪙</div>
+            <div class="result" id="coinResult">Coin: -</div>
+            <div class="dice" id="dice">🎲</div>
+            <div class="result" id="diceResult">Dice: -</div>
+        </div>
+        <div class="users-area" id="users">
+            {% for user in users %}
+            <div class="user-box" data-index="{{ loop.index0 }}">
+                <span>{{ user.name }}</span>
+                <span class="notification-count">[{{ user.count }}]</span>
+                <input type="text" 
+                       placeholder="/notify heads/tails X or ask a question" 
+                       value="{{ user.condition }}">
+                <div class="notification" style="display: none;"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const coinElement = document.getElementById('coin');
+        const diceElement = document.getElementById('dice');
+        const coinResult = document.getElementById('coinResult');
+        const diceResult = document.getElementById('diceResult');
+        const usersArea = document.getElementById('users');
+
+        // Handle game updates from server
+        socket.on('game_update', (data) => {
+            coinElement.classList.add('tossing');
+            diceElement.classList.add('rolling');
+
+            setTimeout(() => {
+                coinElement.classList.remove('tossing');
+                diceElement.classList.remove('rolling');
+                coinResult.textContent = `Coin: ${data.coin}`;
+                diceResult.textContent = `Dice: ${data.dice}`;
+            }, 500);
+        });
+
+        // Handle user updates from server
+        socket.on('update_users', (users) => {
+            users.forEach((user, index) => {
+                const userBox = usersArea.children[index];
+                userBox.querySelector('.notification-count').textContent = `[${user.count}]`;
+                userBox.querySelector('input').value = user.condition;
+            });
+        });
+
+        // Handle notifications from server
+        socket.on('notification', (data) => {
+            const userBox = usersArea.children[data.index];
+            const notification = userBox.querySelector('.notification');
+            if (data.condition && data.event) {
+                notification.textContent = `Match: ${data.condition}!`;
+            } else {
+                notification.textContent = data.message; // For question responses
+            }
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        });
+
+        // Send condition updates or questions to server
+        usersArea.addEventListener('change', (e) => {
+            if (e.target.tagName === 'INPUT') {
+                const index = e.target.parentElement.dataset.index;
+                socket.emit('update_condition', {
+                    index: parseInt(index),
+                    condition: e.target.value
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    const coinElement = document.getElementById('coin');
+    const diceElement = document.getElementById('dice');
+    const coinResult = document.getElementById('coinResult');
+    const diceResult = document.getElementById('diceResult');
+    const usersArea = document.getElementById('users');
+
+    // Handle game updates from server
+    socket.on('game_update', (data) => {
+        coinElement.classList.add('tossing');
+        diceElement.classList.add('rolling');
+
+        setTimeout(() => {
+            coinElement.classList.remove('tossing');
+            diceElement.classList.remove('rolling');
+            coinResult.textContent = `Coin: ${data.coin}`;
+            diceResult.textContent = `Dice: ${data.dice}`;
+        }, 500);
+    });
+
+    // Handle user updates from server
+    socket.on('update_users', (users) => {
+        users.forEach((user, index) => {
+            const userBox = usersArea.children[index];
+            const countElement = userBox.querySelector('.notification-count');
+            const inputElement = userBox.querySelector('input');
+
+            // Update count
+            countElement.textContent = `[${user.count}]`;
+
+            // Only update input value if server condition differs and input isn't focused
+            if (document.activeElement !== inputElement && inputElement.value !== user.condition) {
+                inputElement.value = user.condition;
+            }
+        });
+    });
+
+    // Handle notifications from server
+    socket.on('notification', (data) => {
+        const userBox = usersArea.children[data.index];
+        const notification = userBox.querySelector('.notification');
+        if (data.condition && data.event) {
+            notification.textContent = `Match: ${data.condition}!`;
+        } else {
+            notification.textContent = data.message; // For question responses
+        }
+        notification.style.display = 'block';
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
+    });
+
+    // Send condition updates or questions to server
+    usersArea.addEventListener('change', (e) => {
+        if (e.target.tagName === 'INPUT') {
+            const index = e.target.parentElement.dataset.index;
+            socket.emit('update_condition', {
+                index: parseInt(index),
+                condition: e.target.value
+            });
+        }
+    });
+</script>

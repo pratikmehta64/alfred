@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f0f0f0;
+}
+
+.container {
+    display: flex;
+    gap: 40px;
+}
+
+.game-area {
+    flex: 1;
+    text-align: center;
+}
+
+.users-area {
+    flex: 1;
+}
+
+.coin, .dice {
+    width: 300px;
+    height: 300px;
+    font-size: 200px;
+    line-height: 300px;
+    margin: 30px auto;
+    transition: transform 0.5s;
+}
+
+.coin.tossing {
+    animation: coinFlip 0.5s linear;
+}
+
+.dice.rolling {
+    animation: diceRoll 0.5s linear;
+}
+
+@keyframes coinFlip {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+}
+
+@keyframes diceRoll {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.result {
+    font-size: 1.5em;
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+.user-box {
+    background: white;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: relative; /* Added for notification positioning */
+}
+
+.user-box span {
+    font-weight: bold;
+    margin-right: 10px;
+    color: #2c3e50;
+}
+
+.user-box input {
+    padding: 5px;
+    width: 200px;
+    margin: 5px 0;
+}
+
+.notification-count {
+    color: #27ae60;
+    margin-left: 10px;
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.notification {
+    color: #27ae60;
+    font-size: 0.9em;
+    margin-top: 5px;
+    padding: 5px;
+    background: rgba(39, 174, 96, 0.1);
+    border-radius: 3px;
+}
