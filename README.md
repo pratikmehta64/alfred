@@ -1,4 +1,4 @@
-# alfred
+# alfred (Work in Progress)
 A POC to demonstrate batch-serving of hyper-personalized notifications
 
 # The demo uses: 
