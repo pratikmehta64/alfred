@@ -20,6 +20,7 @@ examples:
 2. What were the last five coin toss outcomes?
 3. How many times has a heads coincided with a dice roll of 3?
 
-## "But the user preferences here are not 'hyper-personalized' - they are clearly specified using a 'command' struture (see ex.1)
-## That is correct. Users should be able to explain complex cases for their preferences in plain English language and the LLM controller should understand when to notify them.
-## (Will be updated by 7/3/2025)
+"But the user preferences here are not 'hyper-personalized' - they are clearly specified using a 'command' struture (see ex.1)
+
+-That is correct. Users should be able to explain complex cases for their preferences in plain English language and the LLM controller should understand when to notify them.
+(Will be updated by 7/3/2025)
