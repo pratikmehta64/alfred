@@ -8,6 +8,7 @@
 </head>
 <body>
     <h1>Coin Toss & Dice Roll Monitor</h1>
+    <div id="status-box" class="status-box"></div>
     <div class="container">
         <div class="game-area">
             <div class="coin" id="coin">🪙</div>
@@ -21,7 +22,7 @@
                 <span>{{ user.name }}</span>
                 <span class="notification-count">[{{ user.count }}]</span>
                 <input type="text" 
-                       placeholder="/notify heads/tails X or ask a question" 
+                       placeholder="/notify heads/tails X, /notify_special e.g. 'heads and even', or ask a question" 
                        value="{{ user.condition }}">
                 <div class="notification" style="display: none;"></div>
             </div>
@@ -38,12 +39,21 @@
         const coinResult = document.getElementById('coinResult');
         const diceResult = document.getElementById('diceResult');
         const usersArea = document.getElementById('users');
+        const statusBox = document.getElementById('status-box');
 
-        // Handle game updates from server
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // Handle game updates
         socket.on('game_update', (data) => {
             coinElement.classList.add('tossing');
             diceElement.classList.add('rolling');
-
             setTimeout(() => {
                 coinElement.classList.remove('tossing');
                 diceElement.classList.remove('rolling');
@@ -52,23 +62,24 @@
             }, 500);
         });
 
-        // Handle user updates from server
+        // Handle user updates (only update count, not input)
         socket.on('update_users', (users) => {
             users.forEach((user, index) => {
                 const userBox = usersArea.children[index];
-                userBox.querySelector('.notification-count').textContent = `[${user.count}]`;
-                userBox.querySelector('input').value = user.condition;
+                const countElement = userBox.querySelector('.notification-count');
+                countElement.textContent = `[${user.count}]`;
+                // Removed input value update logic
             });
         });
 
-        // Handle notifications from server
+        // Handle notifications with timestamp
         socket.on('notification', (data) => {
             const userBox = usersArea.children[data.index];
             const notification = userBox.querySelector('.notification');
             if (data.condition && data.event) {
-                notification.textContent = `Match: ${data.condition}!`;
+                notification.textContent = `Match: ${data.condition} at ${data.timestamp}!`;
             } else {
-                notification.textContent = data.message; // For question responses
+                notification.textContent = data.message;
             }
             notification.style.display = 'block';
             setTimeout(() => {
@@ -76,14 +87,26 @@
             }, 3000);
         });
 
-        // Send condition updates or questions to server
-        usersArea.addEventListener('change', (e) => {
+        // Handle status updates
+        socket.on('status_update', (data) => {
+            statusBox.textContent = data.message;
+            setTimeout(() => {
+                statusBox.textContent = '';
+            }, 2000);
+        });
+
+        // Send condition updates with debounce
+        const sendUpdate = debounce((index, value) => {
+            socket.emit('update_condition', {
+                index: parseInt(index),
+                condition: value
+            });
+        }, 500);
+
+        usersArea.addEventListener('input', (e) => {
             if (e.target.tagName === 'INPUT') {
                 const index = e.target.parentElement.dataset.index;
-                socket.emit('update_condition', {
-                    index: parseInt(index),
-                    condition: e.target.value
-                });
+                sendUpdate(index, e.target.value);
             }
         });
     </script>

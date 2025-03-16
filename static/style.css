@@ -6,11 +6,23 @@ body {
     background-color: #f0f0f0;
 }
 
+.status-box {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #e74c3c; /* Bright red for visibility */
+    padding: 10px;
+    margin: 10px 0;
+    background: rgba(231, 76, 60, 0.1); /* Light red background */
+    border-radius: 5px;
+}
+
 .container {
     display: flex;
     gap: 40px;
 }
 
+/* Rest of the existing CSS remains unchanged */
 .game-area {
     flex: 1;
     text-align: center;
@@ -59,7 +71,7 @@ body {
     margin: 10px 0;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    position: relative; /* Added for notification positioning */
+    position: relative;
 }
 
 .user-box span {
