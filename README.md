@@ -17,5 +17,6 @@ OR enter any other natural langauge query
 
 examples:
 1. /notify heads 3
+2. /notify_special Only if there have been three consecutive heads.
 2. What were the last five coin toss outcomes?
 3. How many times has a heads coincided with a dice roll of 3?
